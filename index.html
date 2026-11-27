@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<!-- PWA（ホーム画面追加時のアプリ化）対応タグ -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="店頭買取POS">
@@ -69,7 +68,7 @@
     color: var(--primary); border-bottom-color: var(--primary); background: #f0f9ff;
   }
 
-  .container { max-width: 960px; margin: 0 auto; padding: 14px; }
+  .container { max-width: 1040px; margin: 0 auto; padding: 14px; }
   .view { display: none; }
   .view.active { display: block; }
 
@@ -80,34 +79,44 @@
   .card-header {
     font-size: 1.05rem; font-weight: 800; color: var(--text);
     margin-bottom: 14px; padding-bottom: 8px; border-bottom: 2px solid #f1f5f9;
-    display: flex; justify-content: space-between; align-items: center;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;
   }
 
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-  @media (max-width: 640px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  .grid-2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  @media (max-width: 680px) { .grid-2, .grid-3 { grid-template-columns: minmax(0, 1fr); } }
 
-  .field { margin-bottom: 12px; }
+  .field { margin-bottom: 12px; min-width: 0; }
   label { display: block; font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 5px; }
   .req { background: var(--danger); color: #fff; font-size: 0.7rem; padding: 1px 5px; border-radius: 4px; margin-left: 4px; }
 
   input, select {
-    width: 100%; padding: 12px; font-size: 1rem; border: 1.5px solid var(--border);
+    width: 100%; max-width: 100%; min-width: 0;
+    padding: 11px 12px; font-size: 1rem; border: 1.5px solid var(--border);
     border-radius: 10px; background: #fff; color: var(--text);
+    -webkit-appearance: none; appearance: none;
+  }
+  input[type="date"] {
+    min-height: 46px;
+    line-height: 1.2;
+  }
+  input[type="checkbox"] {
+    -webkit-appearance: checkbox; appearance: checkbox;
+    width: 20px; height: 20px; padding: 0; cursor: pointer;
   }
   input:focus, select:focus { outline: none; border-color: var(--primary); background: #f8fafc; }
 
   /* タッチ選択チップ */
   .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
   .chip {
-    flex: 1; min-width: 78px; padding: 12px 10px; text-align: center;
+    flex: 1; min-width: 82px; padding: 11px 8px; text-align: center;
     border: 1.5px solid var(--border); border-radius: 10px; background: #fff;
     font-weight: 700; font-size: 0.9rem; cursor: pointer; user-select: none;
   }
   .chip.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 
   /* ランク専用色 */
-  .rank-btn { padding: 12px 6px; font-size: 1.05rem; }
+  .rank-btn { padding: 10px 6px; font-size: 1.05rem; }
   .rank-btn[data-rank="S"].active { background: #7c3aed; border-color: #7c3aed; }
   .rank-btn[data-rank="A"].active { background: #0284c7; border-color: #0284c7; }
   .rank-btn[data-rank="B"].active { background: #16a34a; border-color: #16a34a; }
@@ -122,21 +131,44 @@
 
   /* ボタン */
   .btn {
-    padding: 14px 20px; border-radius: 10px; border: none; font-size: 1rem; font-weight: 700;
+    padding: 13px 18px; border-radius: 10px; border: none; font-size: 0.95rem; font-weight: 700;
     cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   }
   .btn-primary { background: var(--primary); color: #fff; }
   .btn-accent { background: var(--accent); color: #fff; }
   .btn-success { background: var(--success); color: #fff; }
+  .btn-warn { background: #7c3aed; color: #fff; }
   .btn-ghost { background: #fff; border: 1.5px solid var(--border); color: var(--text); }
-  .btn-sm { padding: 8px 12px; font-size: 0.85rem; }
+  .btn-sm { padding: 7px 11px; font-size: 0.82rem; }
   .btn-block { width: 100%; }
 
   /* テーブル */
   table { width: 100%; border-collapse: collapse; }
-  th, td { padding: 10px 8px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 0.92rem; }
-  th { background: #f8fafc; color: var(--muted); font-size: 0.8rem; }
-  .num { text-align: right; font-family: monospace; font-weight: 700; font-size: 1.05rem; }
+  th, td { padding: 8px 6px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 0.9rem; vertical-align: middle; }
+  th { background: #f8fafc; color: var(--muted); font-size: 0.78rem; white-space: nowrap; }
+  .num { text-align: right; font-family: monospace; font-weight: 700; font-size: 1rem; white-space: nowrap; }
+
+  /* 明細内インライン編集 */
+  .cell-input {
+    padding: 6px 8px; font-size: 0.88rem; border-radius: 6px; border: 1px solid #cbd5e1;
+  }
+  .cell-select {
+    padding: 6px 4px; font-size: 0.88rem; border-radius: 6px; border: 1px solid #cbd5e1;
+    text-align: center; font-weight: 700; min-width: 52px;
+  }
+  .boost-badge {
+    display: inline-block; background: #f3e8ff; color: #7c3aed; border: 1px solid #d8b4fe;
+    font-size: 0.75rem; font-weight: 700; padding: 1px 6px; border-radius: 6px;
+  }
+
+  /* キャンペーン・金額アップバー */
+  .boost-panel {
+    background: #faf5ff; border: 1.5px solid #e9d5ff; border-radius: 12px;
+    padding: 12px; margin-bottom: 12px;
+  }
+  .boost-row {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  }
 
   /* 合計表示 */
   .summary-box {
@@ -154,6 +186,24 @@
   .sig-hint {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     color: #cbd5e1; font-weight: 700; font-size: 1.1rem; pointer-events: none;
+  }
+
+  /* 印刷用スタイル */
+  .print-only { display: none; }
+  @media print {
+    body { background: #fff; padding: 0; }
+    header, .tabs, #v-cust, #v-item, #v-hist, .no-print { display: none !important; }
+    #v-sign { display: block !important; }
+    .container { max-width: 100%; padding: 0; }
+    .card { box-shadow: none; border: none; padding: 0; }
+    .print-only { display: block !important; }
+    .summary-box {
+      background: #fff !important; color: #000 !important;
+      border: 2px solid #000; padding: 10px 14px;
+    }
+    .summary-price { color: #000 !important; font-size: 1.5rem; }
+    th, td { border: 1px solid #94a3b8; padding: 6px 8px; font-size: 0.85rem; }
+    .sig-box { border: 1px solid #000; height: 120px; }
   }
 </style>
 </head>
@@ -233,6 +283,7 @@
           <div class="chip" onclick="pickChip(this, 'idChips')">資格確認書</div>
           <div class="chip" onclick="pickChip(this, 'idChips')">パスポート</div>
           <div class="chip" onclick="pickChip(this, 'idChips')">在留カード</div>
+          <div class="chip" onclick="pickChip(this, 'idChips')">学生証</div>
         </div>
       </div>
       <div class="grid-2">
@@ -257,19 +308,20 @@
       <div class="field">
         <label>カテゴリ</label>
         <div class="chip-group" id="catChips">
-          <div class="chip active" onclick="pickChip(this, 'catChips')">衣類・古着</div>
-          <div class="chip" onclick="pickChip(this, 'catChips')">ブランド</div>
-          <div class="chip" onclick="pickChip(this, 'catChips')">家電・スマホ</div>
-          <div class="chip" onclick="pickChip(this, 'catChips')">ホビー・トレカ</div>
-          <div class="chip" onclick="pickChip(this, 'catChips')">本・メディア</div>
-          <div class="chip" onclick="pickChip(this, 'catChips')">その他</div>
+          <div class="chip active" onclick="selectCategory(this)">衣類・古着</div>
+          <div class="chip" onclick="selectCategory(this)">ブランド</div>
+          <div class="chip" onclick="selectCategory(this)">家電・スマホ</div>
+          <div class="chip" onclick="selectCategory(this)">ホビー・トレカ</div>
+          <div class="chip" onclick="selectCategory(this)">本・メディア</div>
+          <div class="chip" onclick="selectCategory(this)">その他</div>
         </div>
       </div>
 
       <div class="grid-2">
         <div class="field">
           <label>商品名 / ブランド / メーカー <span class="req">必須</span></label>
-          <input type="text" id="iName" placeholder="例：NIKE エアフォース1 27cm">
+          <input type="text" id="iName" list="brandSuggestions" placeholder="例：NIKE エアフォース1 27cm" autocomplete="off">
+          <datalist id="brandSuggestions"></datalist>
         </div>
         <div class="field">
           <label>JAN / 型番（任意）</label>
@@ -300,10 +352,18 @@
         </div>
       </div>
 
-      <div class="grid-2" style="align-items:end;">
+      <div class="grid-3" style="align-items:end;">
         <div class="field" style="margin-bottom:0;">
-          <label>買取金額（円）<span class="req">必須</span></label>
-          <input type="number" id="iPrice" placeholder="0" style="font-size:1.3rem; font-weight:800; text-align:right;">
+          <label>単価（円）<span class="req">必須</span></label>
+          <input type="number" id="iPrice" placeholder="0" style="font-size:1.25rem; font-weight:800; text-align:right;">
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>個数 <span class="req">必須</span></label>
+          <div style="display:flex; gap:6px;">
+            <input type="number" id="iQty" value="1" min="1" style="font-size:1.2rem; font-weight:800; text-align:center;">
+            <button type="button" class="btn btn-ghost btn-sm" onclick="changeQty(-1)">-1</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="changeQty(1)">+1</button>
+          </div>
         </div>
         <div style="display:flex; gap:6px; flex-wrap:wrap;">
           <button type="button" class="btn btn-ghost btn-sm" onclick="plusPrice(100)">+100</button>
@@ -317,11 +377,48 @@
     </div>
 
     <div class="card">
-      <div class="card-header">査定明細</div>
+      <div class="card-header">
+        <span>査定明細（直接タップで修正可能）</span>
+        <div style="display:flex; gap:6px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-ghost btn-sm" onclick="selectRange(1, 6)">1〜6番を選択</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="selectAllItems(true)">全選択</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="selectAllItems(false)">全解除</button>
+        </div>
+      </div>
+
+      <!-- 選択商品の買取金額アップ操作パネル -->
+      <div class="boost-panel">
+        <div style="font-size:0.82rem; font-weight:700; color:#6b21a8; margin-bottom:6px;">
+          ✨ チェックした商品の買取金額アップ（未チェックは通常料金のまま）
+        </div>
+        <div class="boost-row">
+          <button type="button" class="btn btn-warn btn-sm" onclick="applyBoostPercent(10)">選択中 +10%</button>
+          <button type="button" class="btn btn-warn btn-sm" onclick="applyBoostPercent(20)">選択中 +20%</button>
+          <button type="button" class="btn btn-warn btn-sm" onclick="applyBoostPercent(30)">選択中 +30%</button>
+          <div style="display:flex; align-items:center; gap:4px;">
+            <input type="number" id="customBoostInput" placeholder="例: 500" style="width:95px; padding:6px 8px; font-size:0.88rem;">
+            <button type="button" class="btn btn-warn btn-sm" onclick="applyBoostFixed()">円UP</button>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="clearBoostSelected()">UP解除</button>
+        </div>
+      </div>
+
       <div style="overflow-x:auto;">
         <table>
           <thead>
-            <tr><th>No</th><th>カテゴリ</th><th>商品名</th><th>ランク</th><th>備考</th><th class="num">金額</th><th></th></tr>
+            <tr>
+              <th style="width:36px;">対象</th>
+              <th>No</th>
+              <th>カテゴリ</th>
+              <th style="min-width:150px;">商品名</th>
+              <th>ランク</th>
+              <th style="min-width:110px;">備考</th>
+              <th style="width:68px;">個数</th>
+              <th class="num" style="min-width:95px;">単価(元値)</th>
+              <th class="num">UP額</th>
+              <th class="num">小計</th>
+              <th></th>
+            </tr>
           </thead>
           <tbody id="itemTable"></tbody>
         </table>
@@ -337,11 +434,21 @@
   <!-- ③ 提示・サイン -->
   <section id="v-sign" class="view">
     <div class="card">
-      <div class="card-header">買取査定明細書（お客様確認用）</div>
+      <div class="card-header">
+        <span>買取査定明細書（お客様確認用）</span>
+        <button type="button" class="btn btn-ghost btn-sm no-print" onclick="window.print()">🖨 査定表を印刷</button>
+      </div>
       <p><strong id="dispCustName">----</strong> 様 （受付No: <span id="dispRecNo">----</span>）</p>
       <table>
         <thead>
-          <tr><th>商品名</th><th>状態</th><th class="num">査定額</th></tr>
+          <tr>
+            <th>カテゴリ</th>
+            <th>商品名</th>
+            <th>ランク</th>
+            <th class="num">元値</th>
+            <th class="num">金額アップ</th>
+            <th class="num">査定額</th>
+          </tr>
         </thead>
         <tbody id="confirmTable"></tbody>
       </table>
@@ -358,7 +465,7 @@
       <div class="field">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
           <label style="margin:0;">お客様ご署名（指・タッチペンで記入）</label>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="clearSig()">クリア</button>
+          <button type="button" class="btn btn-ghost btn-sm no-print" onclick="clearSig()">クリア</button>
         </div>
         <div class="sig-box">
           <canvas id="sigPad"></canvas>
@@ -366,7 +473,7 @@
         </div>
       </div>
 
-      <div class="grid-2" style="margin-top:16px;">
+      <div class="grid-2 no-print" style="margin-top:16px;">
         <button class="btn btn-ghost" onclick="finishReception('キャンセル')">キャンセル（返却）</button>
         <button class="btn btn-success" onclick="finishReception('買取成立')">✔ 同意して買取成立</button>
       </div>
@@ -399,6 +506,38 @@
   let records = JSON.parse(localStorage.getItem('pos_kaitori_records') || '[]');
   let signed = false;
 
+  // カテゴリ別の入力例＆予測変換候補
+  const categoryExamples = {
+    '衣類・古着': '例：NIKE エアフォース1 27cm / THE NORTH FACE ヌプシ',
+    'ブランド': '例：ティファニー オープンハート ネックレス / ルイヴィトン 長財布',
+    '家電・スマホ': '例：Apple iPhone 15 Pro 256GB / Dyson V12 コードレス掃除機',
+    'ホビー・トレカ': '例：ポケモンカード ピカチュウ SAR / ガンプラ MG 1/100',
+    '本・メディア': '例：ONE PIECE 全巻セット / Nintendo Switch ソフト',
+    'その他': '例：コールマン ランタン / YAMAHA アコースティックギター'
+  };
+
+  const brandDictionary = [
+    // ブランド・ジュエリー
+    'ティファニー (TIFFANY & Co.)', 'ティファニー オープンハート ネックレス', 'ティファニー バイザヤード',
+    'ルイヴィトン (LOUIS VUITTON)', 'ルイヴィトン モノグラム 長財布', 'ルイヴィトン ネヴァーフル',
+    'シャネル (CHANEL)', 'シャネル マトラッセ チェーンショルダー',
+    'エルメス (HERMES)', 'エルメス バーキン', 'エルメス エールライン',
+    'グッチ (GUCCI)', 'グッチ GGマーモント',
+    'プラダ (PRADA)', 'プラダ ナイロン リュック',
+    'コーチ (COACH)', 'カルティエ (Cartier)', 'ブルガリ (BVLGARI)', 'ロレックス (ROLEX)', 'オメガ (OMEGA)',
+    // 衣類・スニーカー
+    'NIKE (ナイキ)', 'NIKE エアフォース1', 'NIKE エアマックス95', 'NIKE ダンク LOW',
+    'adidas (アディダス)', 'adidas スタンスミス', 'adidas サンバ',
+    'THE NORTH FACE (ザ・ノース・フェイス)', 'THE NORTH FACE ヌプシジャケット', 'THE NORTH FACE バルトロ',
+    'Supreme (シュプリーム)', 'patagonia (パタゴニア)', 'UNIQLO (ユニクロ)', 'STUSSY (ステューシー)',
+    // 家電・スマホ
+    'Apple iPhone 15', 'Apple iPhone 14', 'Apple iPad Air', 'Apple AirPods Pro', 'Apple Watch',
+    'SONY ワイヤレスイヤホン', 'SONY PlayStation 5', 'Nintendo Switch 有機ELモデル',
+    'Dyson (ダイソン) 掃除機', 'Panasonic ドライヤー ナノケア', 'BALMUDA トースター',
+    // ホビー・その他
+    'ポケモンカードゲーム', '遊戯王OCG', 'ワンピースカードゲーム', 'BANDAI ガンプラ', 'LEGO (レゴ)'
+  ];
+
   // PWAスタンドアロン判定
   if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
     document.getElementById('modeBadge').textContent = 'PWA App';
@@ -406,10 +545,16 @@
 
   window.onload = () => {
     newRecNo();
+    initSuggestions();
     renderItems();
     renderHistory();
     setupCanvas();
   };
+
+  function initSuggestions() {
+    const dl = document.getElementById('brandSuggestions');
+    dl.innerHTML = brandDictionary.map(item => `<option value="${item}">`).join('');
+  }
 
   function newRecNo() {
     const d = new Date();
@@ -438,6 +583,13 @@
     el.classList.add('active');
   }
 
+  function selectCategory(el) {
+    pickChip(el, 'catChips');
+    const cat = el.textContent.trim();
+    const input = document.getElementById('iName');
+    input.placeholder = categoryExamples[cat] || '商品名を入力してください';
+  }
+
   function calcAge() {
     const val = document.getElementById('cDob').value;
     if (!val) return;
@@ -460,24 +612,99 @@
     el.value = (parseInt(el.value || '0', 10)) + n;
   }
 
+  function changeQty(delta) {
+    const el = document.getElementById('iQty');
+    const next = Math.max(1, (parseInt(el.value || '1', 10)) + delta);
+    el.value = next;
+  }
+
   function addItem() {
     const name = document.getElementById('iName').value.trim();
     const price = parseInt(document.getElementById('iPrice').value, 10);
+    const qty = Math.max(1, parseInt(document.getElementById('iQty').value || '1', 10));
     if (!name) return alert('商品名を入力してください');
-    if (isNaN(price) || price < 0) return alert('査定金額を入力してください');
+    if (isNaN(price) || price < 0) return alert('単価（買取金額）を入力してください');
 
     const cat = document.querySelector('#catChips .active').textContent;
     const code = document.getElementById('iCode').value.trim();
     const rank = document.querySelector('#rankChips .active').dataset.rank;
     const tags = Array.from(document.querySelectorAll('#tagChips .active')).map(t => t.textContent).join('/');
 
-    currentItems.push({ cat, name, code, rank, tags, price });
+    currentItems.push({
+      cat,
+      name,
+      code,
+      rank,
+      tags,
+      price,       // 単価（元値）
+      qty,         // 個数
+      boost: 0,    // 1点あたりの金額アップ額
+      selected: false
+    });
     renderItems();
 
     document.getElementById('iName').value = '';
     document.getElementById('iCode').value = '';
     document.getElementById('iPrice').value = '';
+    document.getElementById('iQty').value = '1';
     document.querySelectorAll('#tagChips .active').forEach(t => t.classList.remove('active'));
+  }
+
+  function updateItemField(idx, field, val) {
+    const it = currentItems[idx];
+    if (!it) return;
+    if (field === 'price') {
+      it.price = Math.max(0, parseInt(val || '0', 10));
+    } else if (field === 'qty') {
+      it.qty = Math.max(1, parseInt(val || '1', 10));
+    } else if (field === 'selected') {
+      it.selected = Boolean(val);
+    } else {
+      it[field] = val;
+    }
+    renderItems();
+  }
+
+  function selectAllItems(flag) {
+    currentItems.forEach(it => it.selected = flag);
+    renderItems();
+  }
+
+  function selectRange(startNo, endNo) {
+    currentItems.forEach((it, idx) => {
+      const no = idx + 1;
+      it.selected = (no >= startNo && no <= endNo);
+    });
+    renderItems();
+  }
+
+  function applyBoostPercent(pct) {
+    const targets = currentItems.filter(it => it.selected);
+    if (targets.length === 0) return alert('金額アップしたい商品にチェックを入れてください');
+    targets.forEach(it => {
+      it.boost = Math.round((it.price * pct) / 100);
+    });
+    renderItems();
+  }
+
+  function applyBoostFixed() {
+    const targets = currentItems.filter(it => it.selected);
+    if (targets.length === 0) return alert('金額アップしたい商品にチェックを入れてください');
+    const add = parseInt(document.getElementById('customBoostInput').value || '0', 10);
+    if (isNaN(add) || add < 0) return alert('アップする金額（円）を入力してください');
+    targets.forEach(it => {
+      it.boost = add;
+    });
+    renderItems();
+  }
+
+  function clearBoostSelected() {
+    const targets = currentItems.filter(it => it.selected);
+    if (targets.length === 0) return alert('解除したい商品にチェックを入れてください');
+    targets.forEach(it => {
+      it.boost = 0;
+    });
+    renderItems();
   }
 
   function delItem(idx) {
@@ -485,44 +712,92 @@
     renderItems();
   }
 
+  function getItemTotals(it) {
+    const qty = it.qty || 1;
+    const baseSub = it.price * qty;
+    const boostSub = (it.boost || 0) * qty;
+    return { qty, baseSub, boostSub, finalSub: baseSub + boostSub };
+  }
+
   function renderItems() {
     const tbody = document.getElementById('itemTable');
-    const total = currentItems.reduce((s, i) => s + i.price, 0);
-    document.getElementById('badgeCount').textContent = currentItems.length;
-    document.getElementById('sumCount').textContent = currentItems.length;
-    document.getElementById('sumPrice').textContent = `¥${total.toLocaleString()}`;
+    const totalCount = currentItems.reduce((s, i) => s + (i.qty || 1), 0);
+    const totalPrice = currentItems.reduce((s, i) => s + getItemTotals(i).finalSub, 0);
+
+    document.getElementById('badgeCount').textContent = totalCount;
+    document.getElementById('sumCount').textContent = totalCount;
+    document.getElementById('sumPrice').textContent = `¥${totalPrice.toLocaleString()}`;
 
     if (currentItems.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#94a3b8;">商品が登録されていません</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; color:#94a3b8;">商品が登録されていません</td></tr>`;
       return;
     }
-    tbody.innerHTML = currentItems.map((it, i) => `
-      <tr>
+
+    tbody.innerHTML = currentItems.map((it, i) => {
+      const { qty, boostSub, finalSub } = getItemTotals(it);
+      return `
+      <tr style="${it.selected ? 'background:#faf5ff;' : ''}">
+        <td style="text-align:center;">
+          <input type="checkbox" ${it.selected ? 'checked' : ''} onchange="updateItemField(${i}, 'selected', this.checked)">
+        </td>
         <td>${i+1}</td>
-        <td>${it.cat}</td>
-        <td><strong>${it.name}</strong><br><small style="color:#64748b">${it.code}</small></td>
-        <td><strong>${it.rank}</strong></td>
-        <td><small>${it.tags || '-'}</small></td>
-        <td class="num">¥${it.price.toLocaleString()}</td>
+        <td><small>${it.cat}</small></td>
+        <td>
+          <input type="text" class="cell-input" value="${escapeHtml(it.name)}" onchange="updateItemField(${i}, 'name', this.value)">
+        </td>
+        <td>
+          <select class="cell-select" onchange="updateItemField(${i}, 'rank', this.value)">
+            ${['S','A','B','C','J'].map(r => `<option value="${r}" ${it.rank===r?'selected':''}>${r}</option>`).join('')}
+          </select>
+        </td>
+        <td>
+          <input type="text" class="cell-input" value="${escapeHtml(it.tags || '')}" placeholder="備考" onchange="updateItemField(${i}, 'tags', this.value)">
+        </td>
+        <td>
+          <input type="number" class="cell-input" min="1" value="${qty}" style="text-align:center;" onchange="updateItemField(${i}, 'qty', this.value)">
+        </td>
+        <td>
+          <input type="number" class="cell-input" min="0" value="${it.price}" style="text-align:right; font-family:monospace; font-weight:700;" onchange="updateItemField(${i}, 'price', this.value)">
+        </td>
+        <td class="num">
+          ${boostSub > 0 ? `<span class="boost-badge">+¥${boostSub.toLocaleString()}</span>` : '<span style="color:#94a3b8;">¥0</span>'}
+        </td>
+        <td class="num">¥${finalSub.toLocaleString()}</td>
         <td><button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="delItem(${i})">削除</button></td>
       </tr>
-    `).join('');
+    `}).join('');
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
   function buildConfirmView() {
     document.getElementById('dispCustName').textContent = document.getElementById('cName').value || 'お客様';
     document.getElementById('dispRecNo').textContent = recNo;
-    const total = currentItems.reduce((s, i) => s + i.price, 0);
-    document.getElementById('dispCount').textContent = currentItems.length;
-    document.getElementById('dispTotal').textContent = `¥${total.toLocaleString()}`;
+    const totalCount = currentItems.reduce((s, i) => s + (i.qty || 1), 0);
+    const totalPrice = currentItems.reduce((s, i) => s + getItemTotals(i).finalSub, 0);
+    document.getElementById('dispCount').textContent = totalCount;
+    document.getElementById('dispTotal').textContent = `¥${totalPrice.toLocaleString()}`;
 
-    document.getElementById('confirmTable').innerHTML = currentItems.map(it => `
+    // 印刷・確認テーブル：カテゴリ、商品名、ランク、元値、金額アップ、査定額のみ
+    document.getElementById('confirmTable').innerHTML = currentItems.map(it => {
+      const { qty, baseSub, boostSub, finalSub } = getItemTotals(it);
+      const qtyLabel = qty > 1 ? ` ×${qty}` : '';
+      return `
       <tr>
-        <td>${it.name} <small style="color:#64748b">(${it.cat})</small></td>
-        <td>ランク ${it.rank}</td>
-        <td class="num">¥${it.price.toLocaleString()}</td>
+        <td>${escapeHtml(it.cat)}</td>
+        <td>${escapeHtml(it.name)}${qtyLabel}</td>
+        <td>${it.rank}</td>
+        <td class="num">¥${baseSub.toLocaleString()}</td>
+        <td class="num">${boostSub > 0 ? `+¥${boostSub.toLocaleString()}` : '-'}</td>
+        <td class="num">¥${finalSub.toLocaleString()}</td>
       </tr>
-    `).join('');
+    `}).join('');
     fitCanvas();
   }
 
@@ -576,6 +851,9 @@
     if (currentItems.length === 0) { alert('②査定入力で商品を登録してください'); return navTo('v-item'); }
     if (status === '買取成立' && !signed) return alert('お客様のご署名をお願いします');
 
+    const totalCount = currentItems.reduce((s, i) => s + (i.qty || 1), 0);
+    const totalPrice = currentItems.reduce((s, i) => s + getItemTotals(i).finalSub, 0);
+
     const rec = {
       recNo,
       date: new Date().toLocaleString('ja-JP'),
@@ -588,9 +866,9 @@
       idType: document.querySelector('#idChips .active').textContent,
       idNum: document.getElementById('cIdNum').value,
       staff: document.getElementById('cStaff').value,
-      items: [...currentItems],
-      count: currentItems.length,
-      total: currentItems.reduce((s, i) => s + i.price, 0),
+      items: currentItems.map(it => ({ ...it })),
+      count: totalCount,
+      total: totalPrice,
       status
     };
 
@@ -623,7 +901,7 @@
       <tr>
         <td><code>${r.recNo}</code></td>
         <td><small>${r.date}</small></td>
-        <td><strong>${r.name}</strong></td>
+        <td><strong>${escapeHtml(r.name)}</strong></td>
         <td>${r.count}点</td>
         <td class="num">¥${r.total.toLocaleString()}</td>
         <td style="font-weight:700; color:${r.status==='買取成立'?'var(--success)':'var(--danger)'}">${r.status}</td>
@@ -633,12 +911,15 @@
 
   function downloadCSV() {
     if (records.length === 0) return alert('データがありません');
-    let csv = '\uFEFF受付No,日時,ステータス,顧客名,フリガナ,生年月日,電話番号,職業,住所,本人確認書類,書類番号,担当者,カテゴリ,商品名,型番,ランク,備考,単価\n';
+    let csv = '\uFEFF受付No,日時,ステータス,顧客名,フリガナ,生年月日,電話番号,職業,住所,本人確認書類,書類番号,担当者,カテゴリ,商品名,型番,ランク,備考,個数,単価(元値),UP単価,査定小計\n';
     records.forEach(r => {
       r.items.forEach(it => {
+        const qty = it.qty || 1;
+        const boost = it.boost || 0;
+        const sub = (it.price + boost) * qty;
         const cols = [
           r.recNo, r.date, r.status, r.name, r.kana, r.dob, r.tel, r.job, r.addr,
-          r.idType, r.idNum, r.staff, it.cat, it.name, it.code, it.rank, it.tags, it.price
+          r.idType, r.idNum, r.staff, it.cat, it.name, it.code, it.rank, it.tags, qty, it.price, boost, sub
         ].map(v => `"${String(v || '').replace(/"/g, '""')}"`);
         csv += cols.join(',') + '\n';
       });
