@@ -1,0 +1,12 @@
+{
+  "name": "店頭買取POSシステム",
+  "short_name": "店頭買取POS",
+  "description": "店頭買取の受付・査定・署名・CSV出力プロトタイプ",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f1f5f9",
+  "theme_color": "#0f172a",
+  "orientation": "any",
+  "icons": []
+}
