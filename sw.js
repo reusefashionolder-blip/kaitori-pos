@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kaitori-pos-v1';
+const CACHE_NAME = 'kaitori-pos-v2';
 const ASSETS = [
   './',
   './index.html',
