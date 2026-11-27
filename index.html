@@ -86,7 +86,7 @@
   .grid-3 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
   @media (max-width: 680px) { .grid-2, .grid-3 { grid-template-columns: minmax(0, 1fr); } }
 
-  .field { margin-bottom: 12px; min-width: 0; }
+  .field { margin-bottom: 12px; min-width: 0; position: relative; }
   label { display: block; font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 5px; }
   .req { background: var(--danger); color: #fff; font-size: 0.7rem; padding: 1px 5px; border-radius: 4px; margin-left: 4px; }
 
@@ -105,6 +105,34 @@
     width: 20px; height: 20px; padding: 0; cursor: pointer;
   }
   input:focus, select:focus { outline: none; border-color: var(--primary); background: #f8fafc; }
+
+  /* 予測変換ドロップダウン */
+  .suggest-list {
+    display: none;
+    position: absolute;
+    left: 0; right: 0; top: 100%;
+    z-index: 200;
+    background: #fff;
+    border: 1.5px solid var(--primary);
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    max-height: 220px;
+    overflow-y: auto;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.14);
+  }
+  .suggest-list.open { display: block; }
+  .suggest-item {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .suggest-item:last-child { border-bottom: none; }
+  .suggest-item:hover, .suggest-item:active {
+    background: #f0f9ff;
+    color: var(--primary-dark);
+    font-weight: 700;
+  }
 
   /* タッチ選択チップ */
   .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -189,14 +217,12 @@
   }
 
   /* 印刷用スタイル */
-  .print-only { display: none; }
   @media print {
     body { background: #fff; padding: 0; }
     header, .tabs, #v-cust, #v-item, #v-hist, .no-print { display: none !important; }
     #v-sign { display: block !important; }
     .container { max-width: 100%; padding: 0; }
     .card { box-shadow: none; border: none; padding: 0; }
-    .print-only { display: block !important; }
     .summary-box {
       background: #fff !important; color: #000 !important;
       border: 2px solid #000; padding: 10px 14px;
@@ -320,8 +346,9 @@
       <div class="grid-2">
         <div class="field">
           <label>商品名 / ブランド / メーカー <span class="req">必須</span></label>
-          <input type="text" id="iName" list="brandSuggestions" placeholder="例：NIKE エアフォース1 27cm" autocomplete="off">
-          <datalist id="brandSuggestions"></datalist>
+          <input type="text" id="iName" placeholder="例：NIKE エアフォース1 27cm / THE NORTH FACE ヌプシ" autocomplete="off"
+                 onfocus="showSuggestions()" oninput="showSuggestions()">
+          <div class="suggest-list" id="suggestList"></div>
         </div>
         <div class="field">
           <label>JAN / 型番（任意）</label>
@@ -352,7 +379,7 @@
         </div>
       </div>
 
-      <div class="grid-3" style="align-items:end;">
+      <div class="grid-2" style="align-items:end;">
         <div class="field" style="margin-bottom:0;">
           <label>単価（円）<span class="req">必須</span></label>
           <input type="number" id="iPrice" placeholder="0" style="font-size:1.25rem; font-weight:800; text-align:right;">
@@ -364,12 +391,6 @@
             <button type="button" class="btn btn-ghost btn-sm" onclick="changeQty(-1)">-1</button>
             <button type="button" class="btn btn-ghost btn-sm" onclick="changeQty(1)">+1</button>
           </div>
-        </div>
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-          <button type="button" class="btn btn-ghost btn-sm" onclick="plusPrice(100)">+100</button>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="plusPrice(500)">+500</button>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="plusPrice(1000)">+1,000</button>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="plusPrice(5000)">+5,000</button>
         </div>
       </div>
 
@@ -392,12 +413,15 @@
           ✨ チェックした商品の買取金額アップ（未チェックは通常料金のまま）
         </div>
         <div class="boost-row">
-          <button type="button" class="btn btn-warn btn-sm" onclick="applyBoostPercent(10)">選択中 +10%</button>
-          <button type="button" class="btn btn-warn btn-sm" onclick="applyBoostPercent(20)">選択中 +20%</button>
-          <button type="button" class="btn btn-warn btn-sm" onclick="applyBoostPercent(30)">選択中 +30%</button>
+          <div style="display:flex; align-items:center; gap:4px;">
+            <input type="number" id="customPercentInput" placeholder="例: 20" min="0" max="500" style="width:90px; padding:6px 8px; font-size:0.88rem;">
+            <span style="font-size:0.88rem; font-weight:700;">%</span>
+            <button type="button" class="btn btn-warn btn-sm" onclick="applyBoostPercent()">選択中 %UP</button>
+          </div>
           <div style="display:flex; align-items:center; gap:4px;">
             <input type="number" id="customBoostInput" placeholder="例: 500" style="width:95px; padding:6px 8px; font-size:0.88rem;">
-            <button type="button" class="btn btn-warn btn-sm" onclick="applyBoostFixed()">円UP</button>
+            <span style="font-size:0.88rem; font-weight:700;">円</span>
+            <button type="button" class="btn btn-warn btn-sm" onclick="applyBoostFixed()">選択中 円UP</button>
           </div>
           <button type="button" class="btn btn-ghost btn-sm" onclick="clearBoostSelected()">UP解除</button>
         </div>
@@ -436,7 +460,7 @@
     <div class="card">
       <div class="card-header">
         <span>買取査定明細書（お客様確認用）</span>
-        <button type="button" class="btn btn-ghost btn-sm no-print" onclick="window.print()">🖨 査定表を印刷</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="printEstimateSheet()">🖨 査定表を印刷</button>
       </div>
       <p><strong id="dispCustName">----</strong> 様 （受付No: <span id="dispRecNo">----</span>）</p>
       <table>
@@ -506,7 +530,6 @@
   let records = JSON.parse(localStorage.getItem('pos_kaitori_records') || '[]');
   let signed = false;
 
-  // カテゴリ別の入力例＆予測変換候補
   const categoryExamples = {
     '衣類・古着': '例：NIKE エアフォース1 27cm / THE NORTH FACE ヌプシ',
     'ブランド': '例：ティファニー オープンハート ネックレス / ルイヴィトン 長財布',
@@ -517,24 +540,20 @@
   };
 
   const brandDictionary = [
-    // ブランド・ジュエリー
-    'ティファニー (TIFFANY & Co.)', 'ティファニー オープンハート ネックレス', 'ティファニー バイザヤード',
-    'ルイヴィトン (LOUIS VUITTON)', 'ルイヴィトン モノグラム 長財布', 'ルイヴィトン ネヴァーフル',
-    'シャネル (CHANEL)', 'シャネル マトラッセ チェーンショルダー',
-    'エルメス (HERMES)', 'エルメス バーキン', 'エルメス エールライン',
-    'グッチ (GUCCI)', 'グッチ GGマーモント',
-    'プラダ (PRADA)', 'プラダ ナイロン リュック',
+    'ティファニー (TIFFANY & Co.)', 'ティファニー オープンハート ネックレス', 'ティファニー バイザヤード ネックレス', 'ティファニー Tワイヤー リング',
+    'ルイヴィトン (LOUIS VUITTON)', 'ルイヴィトン モノグラム 長財布', 'ルイヴィトン ネヴァーフル', 'ルイヴィトン ジッピーウォレット',
+    'シャネル (CHANEL)', 'シャネル マトラッセ チェーンショルダー', 'シャネル ココマーク ピアス',
+    'エルメス (HERMES)', 'エルメス バーキン', 'エルメス ケリー', 'エルメス エールライン',
+    'グッチ (GUCCI)', 'グッチ GGマーモント', 'グッチ オフィディア',
+    'プラダ (PRADA)', 'プラダ ナイロン リュック', 'プラダ サフィアーノ 長財布',
     'コーチ (COACH)', 'カルティエ (Cartier)', 'ブルガリ (BVLGARI)', 'ロレックス (ROLEX)', 'オメガ (OMEGA)',
-    // 衣類・スニーカー
     'NIKE (ナイキ)', 'NIKE エアフォース1', 'NIKE エアマックス95', 'NIKE ダンク LOW',
     'adidas (アディダス)', 'adidas スタンスミス', 'adidas サンバ',
-    'THE NORTH FACE (ザ・ノース・フェイス)', 'THE NORTH FACE ヌプシジャケット', 'THE NORTH FACE バルトロ',
+    'THE NORTH FACE (ザ・ノース・フェイス)', 'THE NORTH FACE ヌプシジャケット', 'THE NORTH FACE バルトロライトジャケット',
     'Supreme (シュプリーム)', 'patagonia (パタゴニア)', 'UNIQLO (ユニクロ)', 'STUSSY (ステューシー)',
-    // 家電・スマホ
     'Apple iPhone 15', 'Apple iPhone 14', 'Apple iPad Air', 'Apple AirPods Pro', 'Apple Watch',
     'SONY ワイヤレスイヤホン', 'SONY PlayStation 5', 'Nintendo Switch 有機ELモデル',
     'Dyson (ダイソン) 掃除機', 'Panasonic ドライヤー ナノケア', 'BALMUDA トースター',
-    // ホビー・その他
     'ポケモンカードゲーム', '遊戯王OCG', 'ワンピースカードゲーム', 'BANDAI ガンプラ', 'LEGO (レゴ)'
   ];
 
@@ -545,15 +564,42 @@
 
   window.onload = () => {
     newRecNo();
-    initSuggestions();
     renderItems();
     renderHistory();
     setupCanvas();
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#iName') && !e.target.closest('#suggestList')) {
+        hideSuggestions();
+      }
+    });
   };
 
-  function initSuggestions() {
-    const dl = document.getElementById('brandSuggestions');
-    dl.innerHTML = brandDictionary.map(item => `<option value="${item}">`).join('');
+  function showSuggestions() {
+    const input = document.getElementById('iName');
+    const list = document.getElementById('suggestList');
+    const q = input.value.trim().toLowerCase();
+
+    const matches = q
+      ? brandDictionary.filter(item => item.toLowerCase().includes(q))
+      : brandDictionary.slice(0, 12);
+
+    if (matches.length === 0) {
+      list.innerHTML = `<div class="suggest-item" style="color:#64748b; cursor:default;">一致する候補がありません（そのまま入力できます）</div>`;
+    } else {
+      list.innerHTML = matches.slice(0, 15).map(item =>
+        `<div class="suggest-item" onmousedown="pickSuggestion('${escapeJs(item)}')" onclick="pickSuggestion('${escapeJs(item)}')">${escapeHtml(item)}</div>`
+      ).join('');
+    }
+    list.classList.add('open');
+  }
+
+  function hideSuggestions() {
+    document.getElementById('suggestList').classList.remove('open');
+  }
+
+  function pickSuggestion(val) {
+    document.getElementById('iName').value = val;
+    hideSuggestions();
   }
 
   function newRecNo() {
@@ -607,11 +653,6 @@
     }
   }
 
-  function plusPrice(n) {
-    const el = document.getElementById('iPrice');
-    el.value = (parseInt(el.value || '0', 10)) + n;
-  }
-
   function changeQty(delta) {
     const el = document.getElementById('iQty');
     const next = Math.max(1, (parseInt(el.value || '1', 10)) + delta);
@@ -623,7 +664,7 @@
     const price = parseInt(document.getElementById('iPrice').value, 10);
     const qty = Math.max(1, parseInt(document.getElementById('iQty').value || '1', 10));
     if (!name) return alert('商品名を入力してください');
-    if (isNaN(price) || price < 0) return alert('単価（買取金額）を入力してください');
+    if (isNaN(price) || price < 0) return alert('単価を入力してください');
 
     const cat = document.querySelector('#catChips .active').textContent;
     const code = document.getElementById('iCode').value.trim();
@@ -636,12 +677,13 @@
       code,
       rank,
       tags,
-      price,       // 単価（元値）
-      qty,         // 個数
-      boost: 0,    // 1点あたりの金額アップ額
+      price,
+      qty,
+      boost: 0,
       selected: false
     });
     renderItems();
+    hideSuggestions();
 
     document.getElementById('iName').value = '';
     document.getElementById('iCode').value = '';
@@ -678,9 +720,11 @@
     renderItems();
   }
 
-  function applyBoostPercent(pct) {
+  function applyBoostPercent() {
     const targets = currentItems.filter(it => it.selected);
     if (targets.length === 0) return alert('金額アップしたい商品にチェックを入れてください');
+    const pct = parseFloat(document.getElementById('customPercentInput').value);
+    if (isNaN(pct) || pct < 0) return alert('アップするパーセンテージ（%）を入力してください');
     targets.forEach(it => {
       it.boost = Math.round((it.price * pct) / 100);
     });
@@ -741,7 +785,7 @@
           <input type="checkbox" ${it.selected ? 'checked' : ''} onchange="updateItemField(${i}, 'selected', this.checked)">
         </td>
         <td>${i+1}</td>
-        <td><small>${it.cat}</small></td>
+        <td><small>${escapeHtml(it.cat)}</small></td>
         <td>
           <input type="text" class="cell-input" value="${escapeHtml(it.name)}" onchange="updateItemField(${i}, 'name', this.value)">
         </td>
@@ -776,6 +820,10 @@
       .replace(/"/g, '&quot;');
   }
 
+  function escapeJs(str) {
+    return String(str).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  }
+
   function buildConfirmView() {
     document.getElementById('dispCustName').textContent = document.getElementById('cName').value || 'お客様';
     document.getElementById('dispRecNo').textContent = recNo;
@@ -784,7 +832,6 @@
     document.getElementById('dispCount').textContent = totalCount;
     document.getElementById('dispTotal').textContent = `¥${totalPrice.toLocaleString()}`;
 
-    // 印刷・確認テーブル：カテゴリ、商品名、ランク、元値、金額アップ、査定額のみ
     document.getElementById('confirmTable').innerHTML = currentItems.map(it => {
       const { qty, baseSub, boostSub, finalSub } = getItemTotals(it);
       const qtyLabel = qty > 1 ? ` ×${qty}` : '';
@@ -799,6 +846,74 @@
       </tr>
     `}).join('');
     fitCanvas();
+  }
+
+  // 査定表印刷（別ウィンドウで必要な項目のみ出力し、元画面のボタン操作に影響しないようにする）
+  function printEstimateSheet() {
+    const custName = escapeHtml(document.getElementById('cName').value || 'お客様');
+    const totalCount = currentItems.reduce((s, i) => s + (i.qty || 1), 0);
+    const totalPrice = currentItems.reduce((s, i) => s + getItemTotals(i).finalSub, 0);
+
+    const rowsHtml = currentItems.map(it => {
+      const { qty, baseSub, boostSub, finalSub } = getItemTotals(it);
+      const qtyLabel = qty > 1 ? ` ×${qty}` : '';
+      return `
+        <tr>
+          <td>${escapeHtml(it.cat)}</td>
+          <td>${escapeHtml(it.name)}${qtyLabel}</td>
+          <td style="text-align:center;">${it.rank}</td>
+          <td style="text-align:right;">¥${baseSub.toLocaleString()}</td>
+          <td style="text-align:right;">${boostSub > 0 ? `+¥${boostSub.toLocaleString()}` : '-'}</td>
+          <td style="text-align:right; font-weight:700;">¥${finalSub.toLocaleString()}</td>
+        </tr>
+      `;
+    }).join('');
+
+    const html = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>買取査定表 - ${escapeHtml(recNo)}</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Meiryo", sans-serif; padding: 24px; color: #0f172a; }
+  h1 { font-size: 1.3rem; margin: 0 0 8px; }
+  .meta { font-size: 0.9rem; margin-bottom: 16px; color: #334155; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  th, td { border: 1px solid #94a3b8; padding: 8px 10px; font-size: 0.9rem; }
+  th { background: #f1f5f9; text-align: left; }
+  .total { font-size: 1.15rem; font-weight: 800; text-align: right; }
+  @media print { body { padding: 0; } }
+</style>
+</head>
+<body>
+  <h1>買取査定表</h1>
+  <div class="meta">受付No: <strong>${escapeHtml(recNo)}</strong> ／ お客様名: <strong>${custName} 様</strong></div>
+  <table>
+    <thead>
+      <tr>
+        <th>カテゴリ</th>
+        <th>商品名</th>
+        <th style="text-align:center;">ランク</th>
+        <th style="text-align:right;">元値</th>
+        <th style="text-align:right;">金額アップ</th>
+        <th style="text-align:right;">査定額</th>
+      </tr>
+    </thead>
+    <tbody>${rowsHtml || '<tr><td colspan="6" style="text-align:center;">明細なし</td></tr>'}</tbody>
+  </table>
+  <div class="total">合計 ${totalCount} 点 ／ お支払い額: ¥${totalPrice.toLocaleString()}</div>
+  <script>window.onload = function() { window.print(); };<\/script>
+</body>
+</html>`;
+
+    const w = window.open('', '_blank');
+    if (w) {
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+    } else {
+      window.print();
+    }
   }
 
   // サインパッド
